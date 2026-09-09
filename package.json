@@ -1,0 +1,17 @@
+{
+  "name": "typingarena",
+  "version": "1.0.0",
+  "description": "Real-time multiplayer typing battle platform",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "npm run start --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["typing", "multiplayer", "game", "real-time"],
+  "author": "",
+  "license": "MIT"
+}
