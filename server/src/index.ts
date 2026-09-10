@@ -16,7 +16,7 @@ const httpServer = createServer(app);
 
 // CORS config
 const corsOptions = {
-  origin: [CLIENT_URL, 'http://localhost:5173', 'http://localhost:4173'],
+  origin: true, // Automatically reflects the request origin (allows all origins)
   credentials: true,
 };
 
