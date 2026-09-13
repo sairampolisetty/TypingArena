@@ -1,4 +1,4 @@
-﻿import { Monitor, Keyboard } from 'lucide-react';
+import { Monitor, Keyboard } from 'lucide-react';
 
 export default function MobileBlock() {
   return (
@@ -143,13 +143,6 @@ export default function MobileBlock() {
           TYPINGARENA · DESKTOP REQUIRED
         </p>
       </div>
-
-      <style>{
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      }</style>
     </div>
   );
 }
