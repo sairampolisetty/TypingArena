@@ -8,8 +8,22 @@ import PlayerLobby from './pages/PlayerLobby';
 import HostLobby from './pages/HostLobby';
 import GamePage from './pages/GamePage';
 import ResultsPage from './pages/ResultsPage';
+import MobileBlock from './components/MobileBlock';
+
+// Detect mobile/tablet by UA and screen width
+function isMobileDevice(): boolean {
+  const uaMatch = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // Also block small screens (tablets in portrait, phones)
+  const smallScreen = window.innerWidth < 1024;
+  return uaMatch || smallScreen;
+}
 
 export default function App() {
+  // Show a beautiful "desktop only" screen to mobile users
+  if (isMobileDevice()) {
+    return <MobileBlock />;
+  }
+
   return (
     <ToastProvider>
       <BrowserRouter>

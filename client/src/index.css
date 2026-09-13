@@ -697,6 +697,15 @@ textarea.form-input {
   .modal-content { padding: 24px; }
   .toast-container { bottom: 16px; right: 16px; left: 16px; }
   .toast { max-width: 100%; }
+  /* Nav responsive: hide create/join buttons text or stack them */
+  .nav { padding: 10px 14px; gap: 8px; flex-wrap: wrap; }
+  .nav .btn-sm { font-size: 11px; padding: 5px 10px; }
+}
+
+/* Spin animation for MobileBlock */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ─── Fun extras ─────────────────────────────────────────────────────────── */

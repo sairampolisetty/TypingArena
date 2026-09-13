@@ -93,6 +93,8 @@ export default function TypingEngine({
 
   const stateRef = useRef(state);
   stateRef.current = state;
+  const gameStartTimeRef = useRef(gameStartTime);
+  gameStartTimeRef.current = gameStartTime;
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const onProgressRef = useRef(onProgress);
@@ -141,6 +143,32 @@ export default function TypingEngine({
     if (inputRef.current) inputRef.current.value = '';
   }, [text]);
 
+  // Real-time WPM updater
+  useEffect(() => {
+    if (disabled || state.finished) return;
+    const interval = setInterval(() => {
+      const curr = stateRef.current;
+      const start = gameStartTimeRef.current ?? curr.startedAt;
+      if (!start) return;
+
+      const elapsed = Date.now() - start;
+      if (elapsed > 0) {
+        const newWpm = calculateWPM(curr.correctChars, elapsed);
+        if (newWpm !== curr.wpm) {
+          setState(prev => ({ ...prev, wpm: newWpm }));
+          throttledProgress.current({
+            progress: curr.progress,
+            wpm: newWpm,
+            accuracy: curr.accuracy,
+            correctChars: curr.correctChars,
+            incorrectChars: curr.incorrectChars,
+          });
+        }
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [disabled, state.finished]);
+
   const processKey = useCallback((key: string) => {
     const curr = stateRef.current;
     if (disabled || curr.finished) return;
@@ -156,7 +184,8 @@ export default function TypingEngine({
       const newCorrect = wasError ? curr.correctChars : Math.max(0, curr.correctChars - 1);
       const totalTyped = newPos;
       const newAccuracy = calculateAccuracy(newCorrect, totalTyped);
-      const elapsed = curr.startedAt ? Date.now() - curr.startedAt : 0;
+      const start = gameStartTime ?? curr.startedAt;
+      const elapsed = start ? Date.now() - start : 0;
       const newWpm = calculateWPM(newCorrect, elapsed);
       const newProgress = calculateProgress(newPos, text.length);
 
@@ -189,9 +218,10 @@ export default function TypingEngine({
 
     const isCorrect = key === expected;
     const now = Date.now();
-    // Timer starts on FIRST keypress — never count idle time before typing began
+    // Use game start time if available, otherwise first keypress
     const startedAt = curr.startedAt ?? now;
-    const elapsed = now - startedAt;
+    const actualStart = gameStartTime ?? startedAt;
+    const elapsed = now - actualStart;
     const newPos = curr.position + 1;
     const newErrors = new Set(curr.errors);
     if (!isCorrect) newErrors.add(curr.position);
@@ -262,7 +292,14 @@ export default function TypingEngine({
         return;
       }
 
-      if (e.key === 'Backspace' || e.key.length === 1) {
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        processKey('Backspace');
+        return;
+      }
+
+      // Filter out non-printable or weird keys (length > 1 or invisible controls)
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && e.key !== '\x00') {
         e.preventDefault();
         processKey(e.key);
       }
